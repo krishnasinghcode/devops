@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         DOCKERHUB_USER = 'krishnasinghcode'
-        APP_NAME = 'lab7-app'
-        K8S_NAMESPACE = 'default'
-        APP_DIR = 'AWS/devops-app'
+        APP_NAME       = 'lab7-app'
+        K8S_NAMESPACE  = 'default'
+        APP_DIR        = '.'
     }
 
     stages {
@@ -45,13 +45,15 @@ pipeline {
                     usernameVariable: 'DOCKERHUB_USERNAME',
                     passwordVariable: 'DOCKERHUB_PASSWORD'
                 )]) {
-                    sh """
-                    cd ${APP_DIR}
-                    echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-                    docker tag ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_USER}/${APP_NAME}:latest
-                    docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}
-                    docker push ${DOCKERHUB_USER}/${APP_NAME}:latest
-                    """
+                    script {
+                        sh """
+                        cd ${APP_DIR}
+                        echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+                        docker tag ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_USER}/${APP_NAME}:latest
+                        docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}
+                        docker push ${DOCKERHUB_USER}/${APP_NAME}:latest
+                        """
+                    }
                 }
             }
         }
