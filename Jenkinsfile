@@ -57,8 +57,8 @@ pipeline {
                     sh """
                     cd ${APP_DIR}
                     sed -i 's#image: .*#image: ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}#' deployment.yaml
-                    kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}
-                    kubectl apply -f service.yaml -n ${K8S_NAMESPACE}
+                    kubectl apply --validate=false -f deployment.yaml -n ${K8S_NAMESPACE}
+                    kubectl apply --validate=false -f service.yaml -n ${K8S_NAMESPACE}
                     """
                 }
             }
