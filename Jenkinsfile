@@ -9,12 +9,8 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/krishnasinghcode/devops.git'
-            }
-        }
+        // Remove this whole explicit Checkout stage:
+        // stage('Checkout') { ... }
 
         stage('Build Docker Image') {
             steps {
