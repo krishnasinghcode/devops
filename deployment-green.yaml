@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: lab8-app
-        image: krishnasinghcode/lab7-app:22   # Jenkins will update this to :<BUILD_NUMBER>
+        image: krishnasinghcode/lab7-app:23
         ports:
         - containerPort: 3000
