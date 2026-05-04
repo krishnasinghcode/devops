@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: lab8-app
-        image: krishnasinghcode/lab7-app:22   # Jenkins will update later, placeholder
+        image: krishnasinghcode/lab7-app:22   # Jenkins will update later if you want
         ports:
-        - containerPort: 3000                 # adjust if your app uses another port
+        - containerPort: 3000

@@ -1,3 +1,4 @@
+## jenkinsfile
 pipeline {
     agent any
 
@@ -9,47 +10,12 @@ pipeline {
     }
 
     stages {
-        // --- DevSecOps: SAST / Code Quality ---
-        stage('Code Analysis') {
-            steps {
-                script {
-                    // Placeholder for SonarQube or any SAST tool
-                    // In a real setup, configure sonar-scanner with proper URL and token.
-                    sh """
-                    cd ${APP_DIR}
-                    echo "Running static code analysis (placeholder)..."
-                    # sonar-scanner \\
-                    #   -Dsonar.projectKey=healthcare-app \\
-                    #   -Dsonar.sources=. \\
-                    #   -Dsonar.host.url=http://sonarqube:9000 \\
-                    #   -Dsonar.login=\$SONAR_TOKEN
-                    """
-                }
-            }
-        }
-
-        // --- Existing build stage ---
         stage('Build Docker Image') {
             steps {
                 script {
                     sh """
                     cd ${APP_DIR}
                     docker build -t ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER} .
-                    """
-                }
-            }
-        }
-
-        // --- DevSecOps: Container Image Scan ---
-        stage('Container Scan') {
-            steps {
-                script {
-                    // Placeholder for Trivy or similar tool.
-                    // In real setup, uncomment and install trivy.
-                    sh """
-                    cd ${APP_DIR}
-                    echo "Scanning Docker image for vulnerabilities (placeholder)..."
-                    # trivy image --exit-code 1 --severity HIGH,CRITICAL ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
@@ -98,21 +64,6 @@ pipeline {
                         done
                         """
                     }
-                }
-            }
-        }
-
-        // --- DevSecOps: DAST placeholder (after image is built/pushed, app can be deployed to test env) ---
-        stage('DAST Scan') {
-            steps {
-                script {
-                    // Placeholder for OWASP ZAP or similar DAST tool.
-                    // In a real setup, target a test URL where the app is running.
-                    sh """
-                    cd ${APP_DIR}
-                    echo "Running DAST scan against test environment (placeholder)..."
-                    # zap-baseline.py -t http://healthcare-app-test-url -r zap-report.html || true
-                    """
                 }
             }
         }
@@ -167,3 +118,84 @@ pipeline {
         }
     }
 }
+
+## dockerfile
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "start" ]
+
+## deployment-blue.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab8-deployment-blue
+  labels:
+    app: lab8-app
+    version: blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lab8-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: lab8-app
+        version: blue
+    spec:
+      containers:
+      - name: lab8-app
+        image: krishnasinghcode/lab7-app:22   # Jenkins will update later, placeholder
+        ports:
+        - containerPort: 3000                 # adjust if your app uses another port
+## deployment-green.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab8-deployment-green
+  labels:
+    app: lab8-app
+    version: green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lab8-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: lab8-app
+        version: green
+    spec:
+      containers:
+      - name: lab8-app
+        image: krishnasinghcode/lab7-app:23
+        ports:
+        - containerPort: 3000
+
+## service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab7-service
+spec:
+  selector:
+    app: lab7-app
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      nodePort: 30080
