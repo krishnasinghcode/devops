@@ -42,9 +42,7 @@ pipeline {
                         sh """
                         cd ${APP_DIR}
                         echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-                        docker tag ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER} ${DOCKERHUB_USER}/${APP_NAME}:latest
                         docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}
-                        docker push ${DOCKERHUB_USER}/${APP_NAME}:latest
                         """
                     }
                 }
