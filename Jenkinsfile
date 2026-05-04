@@ -42,19 +42,23 @@ pipeline {
                         sh """
                         cd ${APP_DIR}
 
-                        # Retry docker login up to 3 times
-                        for i in 1 2 3; do
+                        # docker login with simple retry
+                        n=0
+                        until [ \$n -ge 3 ]
+                        do
                           echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin && break
-                          echo "docker login failed, retrying in 5s... (attempt $i)"
+                          n=\$((n+1))
+                          echo "docker login failed, retry \$n/3, sleeping 5s..."
                           sleep 5
                         done
 
-                        # Retry docker push up to 3 times
-                        for i in 1 2 3; do
-                          if docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}; then
-                            break
-                          fi
-                          echo "docker push failed, retrying in 5s... (attempt $i)"
+                        # docker push with simple retry
+                        m=0
+                        until [ \$m -ge 3 ]
+                        do
+                          docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER} && break
+                          m=\$((m+1))
+                          echo "docker push failed, retry \$m/3, sleeping 5s..."
                           sleep 5
                         done
                         """
