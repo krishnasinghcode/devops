@@ -19,6 +19,9 @@ spec:
     spec:
       containers:
       - name: lab8-app
-        image: krishnasinghcode/lab7-app:22   # Jenkins will update later if you want
+        image: krishnasinghcode/lab7-app:22   # or latest tag Jenkins set
         ports:
         - containerPort: 3000
+        env:
+        - name: APP_VERSION
+          value: "blue"

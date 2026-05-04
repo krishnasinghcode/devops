@@ -19,12 +19,9 @@ spec:
     spec:
       containers:
       - name: lab8-app
-        image: krishnasinghcode/lab7-app:23   # will be updated by Jenkins
+        image: krishnasinghcode/lab7-app:23   # Jenkins will update to latest
         ports:
         - containerPort: 3000
         env:
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: healthcare-secrets
-              key: db_password
+        - name: APP_VERSION
+          value: "green"
