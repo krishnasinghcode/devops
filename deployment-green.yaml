@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: lab8-app
-        image: krishnasinghcode/lab7-app:23   # Jenkins will update to latest
+        image: krishnasinghcode/lab7-app:24
         ports:
         - containerPort: 3000
         env:

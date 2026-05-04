@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: lab7-container
-          image: krishnasinghcode/lab7-app:23
+          image: krishnasinghcode/lab7-app:24
           ports:
             - containerPort: 3000
