@@ -67,12 +67,25 @@ pipeline {
             }
         }
 
+        // (Optional) keep this for lab7 single deployment if you still use deployment.yaml
         stage('Update K8s Manifest') {
             steps {
                 script {
                     sh """
                     cd ${APP_DIR}
                     sed -i 's#image: .*#image: ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}#' deployment.yaml
+                    """
+                }
+            }
+        }
+
+        // NEW: update green deployment for blue-green
+        stage('Update Green Manifest') {
+            steps {
+                script {
+                    sh """
+                    cd ${APP_DIR}
+                    sed -i 's#image: .*#image: ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}#' deployment-green.yaml
                     """
                 }
             }
@@ -92,7 +105,7 @@ pipeline {
                         git config user.name "Jenkins"
 
                         git status
-                        git add deployment.yaml
+                        git add deployment.yaml deployment-green.yaml
 
                         git commit -m "Update image tag to build ${BUILD_NUMBER}" || echo "No changes to commit"
 

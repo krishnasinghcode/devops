@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab8-deployment-green
+  labels:
+    app: lab8-app
+    version: green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lab8-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: lab8-app
+        version: green
+    spec:
+      containers:
+      - name: lab8-app
+        image: krishnasinghcode/lab7-app:22   # Jenkins will update this to :<BUILD_NUMBER>
+        ports:
+        - containerPort: 3000

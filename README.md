@@ -65,3 +65,36 @@ docker run -d --name jenkins -u root ^
   -v C:/Users/krishna/.kube:/root/.kube ^
   -e KUBECONFIG=/root/.kube/config ^
   jenkins-kubectl
+
+
+
+  ## basically building jenkins with docker and kubernates.
+  cd C:\Users\krishna\Documents\code\AWS\devops-app
+docker build -f Dockerfile.jenkins -t jenkins-kubectl .
+
+2) Run Jenkins container with Docker socket mounted
+Now run Jenkins so it can talk to host Docker:
+
+powershell
+docker stop jenkins
+docker rm jenkins
+
+```powershell
+docker run -d --name jenkins -u root `
+  -p 8080:8080 -p 50000:50000 `
+  -v jenkins_home:/var/jenkins_home `
+  -v //var/run/docker.sock:/var/run/docker.sock `
+  jenkins-kubectl
+```
+
+
+## then run kubernates on my local host
+cd C:\Users\krishna\Documents\code\AWS\devops-app
+git pull
+kubectl apply -f deployment.yaml -n default
+kubectl apply -f service.yaml -n default
+kubectl get pods -n default
+kubectl get svc lab7-service -n default
+
+
+kubectl port-forward service/lab7-service 8081:80 -n default
