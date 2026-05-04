@@ -51,26 +51,38 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Update K8s Manifest') {
             steps {
                 script {
                     sh """
                     cd ${APP_DIR}
                     sed -i 's#image: .*#image: ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}#' deployment.yaml
-                    kubectl apply --validate=false -f deployment.yaml -n ${K8S_NAMESPACE}
-                    kubectl apply --validate=false -f service.yaml -n ${K8S_NAMESPACE}
                     """
                 }
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Commit & Push Manifest') {
             steps {
-                script {
-                    sh """
-                    kubectl get pods -n ${K8S_NAMESPACE}
-                    kubectl get svc lab7-service -n ${K8S_NAMESPACE}
-                    """
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-creds',
+                    usernameVariable: 'GIT_USERNAME',
+                    passwordVariable: 'GIT_PASSWORD'
+                )]) {
+                    script {
+                        sh """
+                        cd ${APP_DIR}
+                        git config user.email "jenkins@local"
+                        git config user.name "Jenkins"
+
+                        git status
+                        git add deployment.yaml
+
+                        git commit -m "Update image tag to build ${BUILD_NUMBER}" || echo "No changes to commit"
+
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/krishnasinghcode/devops.git HEAD:main
+                        """
+                    }
                 }
             }
         }

@@ -20,3 +20,48 @@ kubectl get svc lab7-service
 
 ### port forwarding for kubernates
 kubectl port-forward service/lab7-service 8080:80
+
+
+## Installing and running jenkins with docker socket mounted
+
+docker pull jenkins/jenkins:lts
+
+docker run -d --name jenkins `
+  -p 8080:8080 -p 50000:50000 `
+  -v jenkins_home:/var/jenkins_home `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  jenkins/jenkins:lts
+
+
+## something git permisson with jenkins
+docker exec -it jenkins bash
+cd /var/jenkins_home
+git config --global --add safe.directory '*'
+exit
+
+## need to install docker and kubernates inside the container(jenkins) again
+apt-get install -y docker.io
+which docker
+docker version
+
+apt-get install -y kubectl
+which kubectl
+kubectl version --client
+
+
+## working kubernates.
+docker run -d --name jenkins -u root ^
+  -p 8080:8080 -p 50000:50000 ^
+  -v jenkins_home:/var/jenkins_home ^
+  -v //var/run/docker.sock:/var/run/docker.sock ^
+  -v C:/Users/krishna/.kube:/root/.kube ^
+  -e KUBECONFIG=/root/.kube/config ^
+  jenkins/jenkins:lts
+
+  docker run -d --name jenkins -u root ^
+  -p 8080:8080 -p 50000:50000 ^
+  -v jenkins_home:/var/jenkins_home ^
+  -v //var/run/docker.sock:/var/run/docker.sock ^
+  -v C:/Users/krishna/.kube:/root/.kube ^
+  -e KUBECONFIG=/root/.kube/config ^
+  jenkins-kubectl
