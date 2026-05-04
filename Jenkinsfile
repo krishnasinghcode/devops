@@ -41,8 +41,22 @@ pipeline {
                     script {
                         sh """
                         cd ${APP_DIR}
-                        echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-                        docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}
+
+                        # Retry docker login up to 3 times
+                        for i in 1 2 3; do
+                          echo "${DOCKERHUB_PASSWORD}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin && break
+                          echo "docker login failed, retrying in 5s... (attempt $i)"
+                          sleep 5
+                        done
+
+                        # Retry docker push up to 3 times
+                        for i in 1 2 3; do
+                          if docker push ${DOCKERHUB_USER}/${APP_NAME}:${BUILD_NUMBER}; then
+                            break
+                          fi
+                          echo "docker push failed, retrying in 5s... (attempt $i)"
+                          sleep 5
+                        done
                         """
                     }
                 }
